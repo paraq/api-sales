@@ -35,6 +35,12 @@ class ApiTests(unittest.TestCase):
         expected_response = [200] * 60 + [429]
         self.assertEqual(expected_response, responses)
 
+    def test_item_list(self):
+        time.sleep(60)
+        url = 'http://127.0.0.1:5000/itemlist'
+        responses = requests.get(url).json()
+        self.assertEqual(responses, [58, 87])
+
     @staticmethod
     async def fetch(session, url):
         async with session.get(url) as response:
