@@ -7,6 +7,10 @@ from flask_limiter.util import get_remote_address
 
 
 class ApiSales(Resource):
+    """
+        Api creates route http://127.0.0.1:5000/item/<item_id>
+        GET: Returns quantity of item ordered
+    """
     def __init__(self):
         param_file = 'config.yml'
         with open(param_file, 'r') as ymlfile:
@@ -19,6 +23,7 @@ class ApiSales(Resource):
                                               )
 
     def get(self, id):
+        """Return quantity of item ordered"""
         query = "select * from " + self._param_config['MEASUREMENT'] + " where item=\'"+str(id)+"\'"
         result = self._influxdb_client.query(query)
         qdata = list(result.get_points())
@@ -29,6 +34,10 @@ class ApiSales(Resource):
 
 
 class ApiItemList(ApiSales):
+    """
+            Api creates route http://127.0.0.1:5000/itemlist
+            GET: Returns list of items ordered
+    """
     def get(self):
         items = []
         query = "select * from " + self._param_config['MEASUREMENT']
@@ -42,11 +51,15 @@ class ApiItemList(ApiSales):
 if __name__ == '__main__':
     app = Flask(__name__)
     api = Api(app)
+
+    """Limit the amount of requests to avoid spamming"""
     limiter = Limiter(
         app,
         key_func=get_remote_address,
         default_limits=["60 per minute"],
     )
+
+    """Add routes"""
     api.add_resource(ApiSales, "/item/<int:id>")
     api.add_resource(ApiItemList, "/itemlist")
     app.run(threaded=True)

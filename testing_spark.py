@@ -12,7 +12,6 @@ class SparkTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # cls.supress_logging()
         cls.loader = Loader()
         cls.sc = cls.create_spark_context()
 
@@ -22,7 +21,10 @@ class SparkTest(unittest.TestCase):
 
 
 class SparkUnitTest(SparkTest):
+    """Test cases for spark """
+
     def test_init_mapping(self):
+        """Test for initial mapping"""
         test_rdd = self.sc.parallelize(['{"id": 28, "products": [58, 48, 870]}',
                                         '{"id": 29, "products": [228, 90, 13]}',
                                         '{"id": 30, "products": [204, 90]}',
@@ -32,6 +34,7 @@ class SparkUnitTest(SparkTest):
         self.assertEqual(results, expected_results)
 
     def test_transform(self):
+        """Test for transform method"""
         test_rdd = self.sc.parallelize([[58, 58, 87], [58, 87, 13]])
         loader_out = self.loader._transform(test_rdd)
         expected_result = [{'measurement': 'sales_api_test', 'tags': {'item': '58'}, 'time': '2019-02-07', 'fields': {'quantity': 3}},
@@ -41,6 +44,7 @@ class SparkUnitTest(SparkTest):
         self.assertEqual(loader_out.collect(), expected_result)
 
     def test_influx_loader(self):
+        """Test for influxdb loading"""
         test_rdd = self.sc.parallelize([{'measurement': 'sales_api_test', 'tags': {'item': '58'}, 'time': '2019-02-07', 'fields': {'quantity': 3}},
                                         {'measurement': 'sales_api_test', 'tags': {'item': '87'}, 'time': '2019-02-07', 'fields': {'quantity': 2}}])
         test_rdd.foreachPartition(self.loader._influxdb_loader)
