@@ -1,0 +1,8 @@
+INFLUXDB_URL: "localhost"
+INFLUXDB_LOGIN: "admin"
+INFLUXDB_PASS: "MfxexTnrmdU9rXtY"
+INFLUXDB_DATABASE: "data_trades"
+INFLUXDB_PORT: "8086"
+#switch meaurement while testing
+#MEASUREMENT: "sales_api"
+MEASUREMENT: "sales_api_test"
