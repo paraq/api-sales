@@ -27,7 +27,7 @@ Input file contains following format:
     * Returns quantity of an item sold for last 30 days
     * Returns all items present in the database 
     
-###The details of the files:
+### The details of the files:
  * loader.py : pyspark script to read input file and load data to the InfluxDB
  * testing_spark.py: test cases for spark job
  * api_sales.py: Run API using Flask module with endpoints http://127.0.0.1:5000/item/<itemID> and http://127.0.0.1:5000/itemlist
@@ -62,19 +62,19 @@ Database setup after installing InfluxDB:
 ```
 
 ### Commands
-1. Loading file
+* Loading file
 
 ``` 
     spark-submit loader.py 20190207_transactions.json 
 ``` 
-2. API requests
+* API requests
 ```
      curl -X GET http://127.0.0.1:5000/itemlist --user admin:adminpassword
      curl -X GET http://127.0.0.1:5000/item/<itemID> --user admin:adminpassword
 ```
-3. Testing
+* Testing
 
-    For testing, choose sales_api_test as the measurement from config.yml
+    For testing, choose `sales_api_test` as the measurement from config.yml
     
 ``` 
     python testing_spark.py
