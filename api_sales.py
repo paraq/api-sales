@@ -4,6 +4,18 @@ from influxdb import InfluxDBClient
 import yaml
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_httpauth import HTTPBasicAuth
+
+"""Authentication part"""
+auth = HTTPBasicAuth()
+USER_DATA = {"admin": "adminpassword"}
+
+
+@auth.verify_password
+def verify(username, password):
+    if not (username and password):
+        return False
+    return USER_DATA.get(username) == password
 
 
 class ApiSales(Resource):
@@ -22,15 +34,17 @@ class ApiSales(Resource):
                                               self._param_config["INFLUXDB_DATABASE"]
                                               )
 
+    @auth.login_required
     def get(self, id):
         """Return quantity of item ordered"""
-        query = "select * from " + self._param_config['MEASUREMENT'] + " where item=\'"+str(id)+"\'"
+        query = "select SUM(quantity) from " + self._param_config['MEASUREMENT'] + " where item=\'"+str(id)+"\'" \
+                "and time >= now() - 30d"
         result = self._influxdb_client.query(query)
         qdata = list(result.get_points())
         if not qdata:
             return "Item not found", 404
         else:
-            return (qdata[0]['quantity']), 200
+            return (qdata[0]['sum']), 200
 
 
 class ApiItemList(ApiSales):
@@ -38,6 +52,8 @@ class ApiItemList(ApiSales):
             Api creates route http://127.0.0.1:5000/itemlist
             GET: Returns list of items ordered
     """
+
+    @auth.login_required
     def get(self):
         items = []
         query = "select * from " + self._param_config['MEASUREMENT']
